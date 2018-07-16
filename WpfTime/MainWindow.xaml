@@ -1,0 +1,36 @@
+﻿<Window x:Class="WpfTime.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfTime"
+        xmlns:properties="clr-namespace:WpfTime.Properties"
+        mc:Ignorable="d" 
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent" 
+        Height="62.138" Width="172.464" Topmost="True" SizeToContent="WidthAndHeight"        
+        BorderBrush="Red" Cursor="Cross" ResizeMode="NoResize" Top="0" Left="500" ShowInTaskbar="False">
+    <Window.Resources>
+        <local:ColorConverter x:Key="colorConverter"></local:ColorConverter>
+    </Window.Resources>
+    <StackPanel>
+        <Label  Foreground="{ Binding Mode=TwoWay, Source={x:Static properties:Settings.Default}, Path=Color ,Converter={StaticResource colorConverter}}" 
+                Name="_label"
+                Content="{Binding Path=TimeProperty}" 
+                FontFamily="Segoe Print" FontWeight="Bold" FontSize="14"/>
+        <StackPanel.ContextMenu>
+            <ContextMenu>
+                <MenuItem Name="MenuItemColor" Header="Цвет" Click="MenuItemColor_Click"></MenuItem>
+                <MenuItem Name="MenuItemBorder" Click="MenuItemBorder_Click" Header="Рамка"></MenuItem>
+                <MenuItem Name="MenuItemFont" Click="MenuItemFont_Click" Header="Шрифт" ></MenuItem>
+                <MenuItem Name="MenuItemFormat" Click="MenuItemFormat_Click" Header="Формат" ></MenuItem>
+                <Separator></Separator>
+                <MenuItem Name="MenuItemClose" Click="MenuItemClose_Click" Header="Закрыть" ></MenuItem>
+            </ContextMenu>
+        </StackPanel.ContextMenu>
+    </StackPanel>
+
+    <!--<Window.ContextMenu>
+
+    </Window.ContextMenu>-->
+</Window>
+
