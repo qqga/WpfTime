@@ -8,15 +8,17 @@
         mc:Ignorable="d" 
         AllowsTransparency="True" WindowStyle="None" Background="Transparent" 
         Height="62.138" Width="172.464" Topmost="True" SizeToContent="WidthAndHeight"        
-        BorderBrush="Red" Cursor="Cross" ResizeMode="NoResize" Top="0" Left="500" ShowInTaskbar="False">
+        BorderBrush="Red"  Cursor="Cross" ResizeMode="NoResize" Top="0" Left="500" ShowInTaskbar="False"
+        >
     <Window.Resources>
         <local:ColorConverter x:Key="colorConverter"></local:ColorConverter>
     </Window.Resources>
     <StackPanel>
         <Label  Foreground="{ Binding Mode=TwoWay, Source={x:Static properties:Settings.Default}, Path=Color ,Converter={StaticResource colorConverter}}" 
-                Name="_label"
-                Content="{Binding Path=TimeProperty}" 
-                FontFamily="Segoe Print" FontWeight="Bold" FontSize="14"/>
+                Name="_label"                 
+                FontFamily="Segoe Print" FontWeight="Bold" FontSize="14">
+            <TextBlock Name="_textBlock" Text="{Binding Path=TimeProperty}"></TextBlock>
+        </Label>
         <StackPanel.ContextMenu>
             <ContextMenu>
                 <MenuItem Name="MenuItemColor" Header="Цвет" Click="MenuItemColor_Click"></MenuItem>
@@ -24,6 +26,7 @@
                 <MenuItem Name="MenuItemFont" Click="MenuItemFont_Click" Header="Шрифт" ></MenuItem>
                 <MenuItem Name="MenuItemFormat" Click="MenuItemFormat_Click" Header="Формат" ></MenuItem>
                 <Separator></Separator>
+                <MenuItem Name="MenuItemSave" Click="MenuItemSave_Click" Header="Сохранить" ></MenuItem>
                 <MenuItem Name="MenuItemClose" Click="MenuItemClose_Click" Header="Закрыть" ></MenuItem>
             </ContextMenu>
         </StackPanel.ContextMenu>

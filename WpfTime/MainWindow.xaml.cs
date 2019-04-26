@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using WpfTime.Properties;
 
 namespace WpfTime
@@ -22,104 +23,109 @@ namespace WpfTime
     /// </summary>
     public partial class MainWindow : Window
     {
-        System.Windows.Threading.DispatcherTimer _timer;
-
-
-
-        public string TimeProperty
-        {
-            get { return (string)GetValue(MyPropertyProperty); }
-            set { SetValue(MyPropertyProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for MyProperty.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MyPropertyProperty =
-            DependencyProperty.Register(nameof(TimeProperty), typeof(string), typeof(MainWindow), new PropertyMetadata("def"));
-
-        //public string Format { get; set; } = Properties.Settings.Default.Format;
+        ViewModel _viewModel;
         public MainWindow()
         {
             InitializeComponent();
+            SetSettings();
+            _viewModel = new ViewModel() { };
+            this.DataContext = _viewModel;
 
-            _timer = new System.Windows.Threading.DispatcherTimer();
-            _timer.Interval = TimeSpan.FromMilliseconds(1000);
-            _timer.IsEnabled = true;
-            _timer.Tick += (s, e) =>
-            {
-                TimeProperty = DateTime.Now.ToString(Settings.Default.Format);
-            };
-            //    delegate
-            //{
-            //    TimeProperty = DateTime.Now.ToString(Format);
-            //};
-
-            this.DataContext = this;
+            _viewModel.Bind(vm => vm.Format, Settings.Default, s => s.Format);
+            _viewModel.Bind(vm => vm.Period, Settings.Default, s => s.TimerPeriod);
         }
 
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        void SetSettings()
         {
-            base.OnMouseLeftButtonDown(e);
-            this.DragMove();
+            SetLabelFont(Settings.Default.Font);
+            SetBorderThicknessFromSettings();
         }
 
-        private void MenuItemColor_Click(object sender, RoutedEventArgs e)
+        void SetLabelFont(System.Drawing.Font font)
         {
-            System.Windows.Forms.ColorDialog cd = new System.Windows.Forms.ColorDialog();
-            var result = cd.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                var converter = Resources.Values.OfType<ColorConverter>().FirstOrDefault();
+            _label.FontFamily = new FontFamily(font.Name);
+            _label.FontSize = font.Size * 96.0 / 72.0;
+            _label.FontWeight = font.Style == System.Drawing.FontStyle.Bold ? FontWeights.Bold : FontWeights.Regular;
+            _label.FontStyle = font.Italic ? FontStyles.Italic : FontStyles.Normal;
 
-                _label.Foreground = (SolidColorBrush)converter.Convert(cd.Color, typeof(SolidColorBrush), null, null);
-            }
+            if(font.Strikeout) _textBlock.TextDecorations = TextDecorations.OverLine;
+            if(font.Underline) _textBlock.TextDecorations = TextDecorations.Underline;
+            if(!font.Underline && !font.Strikeout) _textBlock.TextDecorations = null;
         }
-
-        private void MenuItemFont_Click(object sender, RoutedEventArgs e)
+        private void SetBorderThicknessFromSettings()
         {
-            System.Windows.Forms.FontDialog fontDialog = new System.Windows.Forms.FontDialog();
-            if (fontDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                //Debug.WriteLine(fd.Font);
-
-                _label.FontFamily = new FontFamily(fontDialog.Font.Name);
-                _label.FontSize = fontDialog.Font.Size * 96.0 / 72.0;
-                _label.FontWeight = fontDialog.Font.Bold ? FontWeights.Bold : FontWeights.Regular;
-                _label.FontStyle = fontDialog.Font.Italic ? FontStyles.Italic : FontStyles.Normal;
-
-                TextDecorationCollection tdc = new TextDecorationCollection();
-                if (fontDialog.Font.Underline) tdc.Add(TextDecorations.Underline);
-                if (fontDialog.Font.Strikeout) tdc.Add(TextDecorations.Strikethrough);
-                //_label.TextDecorations = tdc;
-            }
-        }
-
-        private void MenuItemBorder_Click(object sender, RoutedEventArgs e)
-        {
-            this.BorderThickness =
-            MessageBox.Show("Показывать рамку?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes ?
-            new Thickness(2) : new Thickness();
-        }
-
-        private void MenuItemFormat_Click(object sender, RoutedEventArgs e)
-        {
-            WindowFormat wf = new WindowFormat();
-            wf.Format = Settings.Default.Format;
-            if (wf.ShowDialog() == true)
-            {
-                Settings.Default.Format = wf.Format;
-            }
+            this.BorderThickness = new Thickness(Settings.Default.BorderThickness);
+            this.BorderBrush = _label.Foreground;
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-
-            Properties.Settings.Default.Save();
+            Settings.Default.Save();
         }
 
-        private void MenuItemClose_Click(object sender, RoutedEventArgs e)
+        #region Drag
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            this.Close();
+            base.OnMouseLeftButtonDown(e);
+            this.DragMove();
+        }
+        #endregion
+
+        #region MenuCommands
+
+        private void MenuItemFormat_Click(object sender, RoutedEventArgs e)
+        {
+            WindowFormat wf = new WindowFormat();
+            wf.Format = wf.Format;
+            if(wf.ShowDialog() == true)
+            {
+                _viewModel.Format = wf.Format;
+            }
+        }
+
+        private void MenuItemBorder_Click(object sender, RoutedEventArgs e)
+        {
+            WindowBorder windowBorder = new WindowBorder();            
+            windowBorder.Thickness = Settings.Default.BorderThickness;
+
+            if(windowBorder.ShowDialog() == true)
+            {
+                Settings.Default.BorderThickness = windowBorder.Thickness;                
+                SetBorderThicknessFromSettings();
+            }
+        }
+
+        private void MenuItemFont_Click(object sender, RoutedEventArgs e)
+        {
+            var fontDialog = new System.Windows.Forms.FontDialog();
+            fontDialog.Font = Settings.Default.Font;
+            if(fontDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var font = fontDialog.Font;
+                SetLabelFont(font);
+                Settings.Default.Font = font;
+            }
+        }
+
+        private void MenuItemColor_Click(object sender, RoutedEventArgs e)
+        {
+            var colorDialog = new System.Windows.Forms.ColorDialog();
+            if(colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                _label.Foreground = ColorToBrush(colorDialog.Color);
+            }
+        }
+
+        private void MenuItemSave_Click(object sender, RoutedEventArgs e) => Settings.Default.Save();
+        private void MenuItemClose_Click(object sender, RoutedEventArgs e) => this.Close();
+        #endregion
+
+        Brush ColorToBrush(System.Drawing.Color color)
+        {
+            var converter = Resources.Values.OfType<ColorConverter>().FirstOrDefault();
+            SolidColorBrush solidColorBrush = (SolidColorBrush)converter.Convert(color, typeof(SolidColorBrush), null, null);
+            return solidColorBrush;
         }
     }
 }

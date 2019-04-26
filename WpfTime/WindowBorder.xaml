@@ -1,0 +1,17 @@
+﻿<Window x:Class="WpfTime.WindowBorder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfTime"
+        mc:Ignorable="d"
+        Title="WindowBorder" Height="124.262" Width="152.764">
+    <StackPanel>
+        <Label>Толщина:</Label>
+        <TextBox x:Name="_textBox_thickness" PreviewTextInput="NumberValidationTextBox"></TextBox>
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="buttonOk" Click="buttonOk_Click" Content="Ok"  Margin="4"/>
+            <Button x:Name="buttonCancel" Click="buttonCancel_Click" Content="Cancel" Margin="4"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

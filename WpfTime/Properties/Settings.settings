@@ -8,5 +8,14 @@
     <Setting Name="Color" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">0, 192, 0</Value>
     </Setting>
+    <Setting Name="Font" Type="System.Drawing.Font" Scope="User">
+      <Value Profile="(Default)">Segoe Print, 14.25pt, style=Bold</Value>
+    </Setting>
+    <Setting Name="BorderThickness" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="TimerPeriod" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
