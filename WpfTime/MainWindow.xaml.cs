@@ -33,6 +33,7 @@ namespace WpfTime
 
             _viewModel.Bind(vm => vm.Format, Settings.Default, s => s.Format);
             _viewModel.Bind(vm => vm.Period, Settings.Default, s => s.TimerPeriod);
+            _viewModel.StartTimer();
         }
 
         void SetSettings()

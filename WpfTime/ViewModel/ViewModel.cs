@@ -17,12 +17,11 @@ namespace WpfTime
         public string _Format;
         public string Format { get => _Format; set { _Format = value; OnPropChanged(); } }
         public int _Period;
-        public int Period { get => _Period; set { _Period = value; OnPropChanged(); } }
+        public int Period { get => _Period; set { _Period = value; _timer.Interval = TimeSpan.FromMilliseconds(value); OnPropChanged(); } }
 
         public ViewModel()
         {
             InitTimer();
-            Start();
         }
 
         void InitTimer()
@@ -32,9 +31,10 @@ namespace WpfTime
             _timer.Tick += (s, e) => TimeProperty = DateTime.Now.ToString(Format);
         }
 
-        void Start()
+        public void StartTimer()
         {
             _timer.IsEnabled = true;
         }
+
     }
 }
